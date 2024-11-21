@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Défiez la Pierre</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
+    h1 {
+      color: #333;
+    }
+    form {
+      margin-top: 20px;
+    }
+    input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      margin-right: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #333;
+    }
+    #thank-you {
+      margin-top: 10px;
+      font-size: 16px;
+      color: green;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Défiez la Pierre</h1>
+  <form id="challenge-form">
+    <input type="text" id="user-input" placeholder="Entrez votre mot ou phrase" required>
+    <button type="submit">Lancer le défi</button>
+  </form>
+  <div id="result"></div>
+  <div id="thank-you">Merci d'avoir joué !</div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "@google/generative-ai": "https://esm.run/@google/generative-ai"
+      }
+    }
+  </script>
+
+  <script type="module">
+    import { GoogleGenerativeAI } from "@google/generative-ai";
+
+    const API_KEY = "AIzaSyDiE2t1fRfvbArshpnkXo5b_B3RIESW1lE";
+
+    const genAI = new GoogleGenerativeAI(API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const form = document.getElementById("challenge-form");
+    const userInput = document.getElementById("user-input");
+    const resultDiv = document.getElementById("result");
+    const thankYouDiv = document.getElementById("thank-you");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const input = userInput.value;
+
+      // Prompt to the AI
+      const prompt = `Est-ce que "${input}" est supérieur à une pierre d'une manière ou d'une autre ? Répondez avec "True" ou "False".`;
+
+      try {
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text().trim();
+
+        // Display the result
+        resultDiv.textContent = `Résultat : ${text}`;
+        thankYouDiv.style.display = "block";
+      } catch (error) {
+        resultDiv.textContent = "Erreur : impossible d'obtenir une réponse.";
+      }
+    });
+  </script>
+</body>
+</html>
